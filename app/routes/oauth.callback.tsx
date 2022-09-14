@@ -6,6 +6,7 @@ import { useActionData, useFetcher, useSearchParams } from "@remix-run/react";
 import { getFormData } from "remix-params-helper";
 import { z } from "zod";
 
+import { POST_LOGIN_REDIRECT_ROUTE } from "~/config";
 import { getSupabase } from "~/integrations/supabase";
 import { refreshAccessToken } from "~/modules/auth/mutations";
 import {
@@ -21,7 +22,7 @@ import { assertIsPost, safeRedirect } from "~/utils/http.server";
 export async function loader({ request }: LoaderArgs) {
   const authSession = await getAuthSession(request);
 
-  if (authSession) return redirect("/notes");
+  if (authSession) return redirect(POST_LOGIN_REDIRECT_ROUTE);
 
   return json({});
 }
@@ -46,7 +47,7 @@ export async function action({ request }: ActionArgs) {
   }
 
   const { redirectTo, refreshToken } = form.data;
-  const safeRedirectTo = safeRedirect(redirectTo, "/notes");
+  const safeRedirectTo = safeRedirect(redirectTo, POST_LOGIN_REDIRECT_ROUTE);
 
   // We should not trust what is sent from the client
   // https://github.com/rphlmr/supa-fly-stack/issues/45
@@ -97,7 +98,8 @@ export default function LoginCallback() {
   const error = useActionData<typeof action>();
   const fetcher = useFetcher();
   const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") ?? "/notes";
+  const redirectTo =
+    searchParams.get("redirectTo") ?? POST_LOGIN_REDIRECT_ROUTE;
   const supabase = useMemo(() => getSupabase(), []);
 
   useEffect(() => {

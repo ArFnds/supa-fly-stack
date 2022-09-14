@@ -1,7 +1,9 @@
 import { createCookieSessionStorage, redirect } from "@remix-run/node";
 
-import { NODE_ENV, SESSION_SECRET } from "../../utils/env";
-import { safeRedirect } from "../../utils/http.server";
+import { POST_LOGOUT_REDIRECT_ROUTE } from "~/config";
+import { NODE_ENV, SESSION_SECRET } from "~/utils/env";
+import { safeRedirect } from "~/utils/http.server";
+
 import { SESSION_ERROR_KEY, SESSION_KEY, SESSION_MAX_AGE } from "./const";
 
 export interface AuthSession {
@@ -91,7 +93,7 @@ export async function commitAuthSession(
 export async function destroyAuthSession(request: Request) {
   const session = await getSession(request);
 
-  return redirect("/", {
+  return redirect(POST_LOGOUT_REDIRECT_ROUTE, {
     headers: {
       "Set-Cookie": await sessionStorage.destroySession(session),
     },

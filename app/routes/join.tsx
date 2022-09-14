@@ -12,6 +12,7 @@ import {
 import { getFormData, useFormInputProps } from "remix-params-helper";
 import { z } from "zod";
 
+import { POST_LOGIN_REDIRECT_ROUTE } from "~/config";
 import { ContinueWithEmailForm } from "~/modules/auth/components";
 import {
   createAuthSession,
@@ -24,7 +25,7 @@ import { assertIsPost } from "~/utils/http.server";
 export async function loader({ request }: LoaderArgs) {
   const authSession = await getAuthSession(request);
 
-  if (authSession) return redirect("/notes");
+  if (authSession) return redirect(POST_LOGIN_REDIRECT_ROUTE);
 
   return json({});
 }
@@ -55,7 +56,11 @@ export async function action({ request }: ActionArgs) {
     );
   }
 
-  const { email, password, redirectTo = "/notes" } = formValidation.data;
+  const {
+    email,
+    password,
+    redirectTo = POST_LOGIN_REDIRECT_ROUTE,
+  } = formValidation.data;
 
   const existingUser = await getUserByEmail(email);
 
